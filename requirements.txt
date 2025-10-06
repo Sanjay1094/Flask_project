@@ -1,7 +1,8 @@
-Flask
-gunicorn
-numpy>=1.26.2
 tensorflow==2.20.0
 xgboost
+flask
 joblib
 opencv-python-headless
+h5py
+gunicorn
+numpy
