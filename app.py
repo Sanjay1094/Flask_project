@@ -14,46 +14,51 @@ app = Flask(__name__)
 # ==========================
 # Google Drive File Handling
 # ==========================
-# Replace this with your actual Google Drive file ID for DenseNet_model.h5
-# ✅ Only file ID, not full URL
-DRIVE_FILE_ID = "1k4h7nCN8TniafdXN64YoMO5WFKnix2iZ"
+DRIVE_FILE_ID = "1k4h7nCN8TniafdXN64YoMO5WFKnix2iZ"  # only the ID
 MODEL_PATH = "DenseNet_model.h5"
 
+# Download model from Drive if not found
 if not os.path.exists(MODEL_PATH):
     print("Downloading DenseNet_model.h5 from Google Drive...")
-    url = f"https://drive.google.com/uc?id={DRIVE_FILE_ID}"
-    gdown.download(url, MODEL_PATH, quiet=False)
-    print("Download completed ✅")
-
+    try:
+        gdown.download(f"https://drive.google.com/uc?id={DRIVE_FILE_ID}", MODEL_PATH, quiet=False)
+        print("✅ Download completed")
+    except Exception as e:
+        print(f"⚠️ Failed to download DenseNet_model.h5: {e}")
 
 # ==========================
-# Load Models
+# Lazy Model Loading
 # ==========================
-densenet_model = tf.keras.models.load_model(MODEL_PATH)
-print("✅ DenseNet model loaded successfully.")
+densenet_model = None
+lstm_model = None
+xgb_model = None
+stacking_model = None
 
-# Optional models — load only if available
-try:
-    lstm_model = tf.keras.models.load_model("LSTM_model.h5")
-    print("✅ LSTM model loaded.")
-except:
-    lstm_model = None
-    print("⚠️ LSTM_model.h5 not found, skipping...")
 
-try:
-    xgb_model = xgb.XGBClassifier()
-    xgb_model.load_model("xgboost_model.json")
-    print("✅ XGBoost model loaded.")
-except:
-    xgb_model = None
-    print("⚠️ xgboost_model.json not found, skipping...")
+def load_models():
+    """Loads models lazily (only when needed)."""
+    global densenet_model, lstm_model, xgb_model, stacking_model
 
-try:
-    stacking_model = joblib.load("stacking_model.joblib")
-    print("✅ Stacking model loaded.")
-except:
-    stacking_model = None
-    print("⚠️ stacking_model.joblib not found, skipping...")
+    # Load DenseNet (primary model)
+    if densenet_model is None and os.path.exists(MODEL_PATH):
+        print("Loading DenseNet_model.h5...")
+        densenet_model = tf.keras.models.load_model(MODEL_PATH)
+        print("✅ DenseNet model loaded successfully.")
+
+    # Load optional models if available
+    if lstm_model is None and os.path.exists("LSTM_model.h5"):
+        lstm_model = tf.keras.models.load_model("LSTM_model.h5")
+        print("✅ LSTM model loaded.")
+
+    if xgb_model is None and os.path.exists("xgboost_model.json"):
+        xgb_model = xgb.XGBClassifier()
+        xgb_model.load_model("xgboost_model.json")
+        print("✅ XGBoost model loaded.")
+
+    if stacking_model is None and os.path.exists("stacking_model.joblib"):
+        stacking_model = joblib.load("stacking_model.joblib")
+        print("✅ Stacking model loaded.")
+
 
 # ==========================
 # Image Requirements
@@ -94,21 +99,26 @@ def research():
 def papers19():
     return render_template('papers19.html')
 
+
 @app.route('/papers20')
 def papers20():
     return render_template('papers20.html')
+
 
 @app.route('/papers21')
 def papers21():
     return render_template('papers21.html')
 
+
 @app.route('/papers22')
 def papers22():
     return render_template('papers22.html')
 
+
 @app.route('/papers23')
 def papers23():
     return render_template('papers23.html')
+
 
 @app.route('/papers24')
 def papers24():
@@ -120,6 +130,8 @@ def papers24():
 # ==========================
 def predict_cancer(image_path):
     """Predicts cancer presence using available models."""
+    load_models()  # Lazy load here only when first called
+
     img = preprocess_image(image_path)
     feature_map = densenet_model.predict(img)
 
@@ -193,9 +205,11 @@ def predict():
         with open(segmented_path, "rb") as img_file:
             segmented_image_encoded = base64.b64encode(img_file.read()).decode('utf-8')
 
-        os.remove(temp_file)
-        os.remove(preprocessed_path)
-        if "Cancer detected" in prediction_result:
+        # Cleanup temporary files
+        for f in [temp_file, preprocessed_path]:
+            if os.path.exists(f):
+                os.remove(f)
+        if "Cancer detected" in prediction_result and os.path.exists(segmented_path):
             os.remove(segmented_path)
 
         return jsonify({
@@ -211,5 +225,3 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
