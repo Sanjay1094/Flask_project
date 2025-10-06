@@ -15,15 +15,16 @@ app = Flask(__name__)
 # Google Drive File Handling
 # ==========================
 # Replace this with your actual Google Drive file ID for DenseNet_model.h5
-DRIVE_FILE_ID = "https://drive.google.com/file/d/1k4h7nCN8TniafdXN64YoMO5WFKnix2iZ/view?usp=sharing"
+# ✅ Only file ID, not full URL
+DRIVE_FILE_ID = "1k4h7nCN8TniafdXN64YoMO5WFKnix2iZ"
 MODEL_PATH = "DenseNet_model.h5"
 
-# Download model from Drive if not found
 if not os.path.exists(MODEL_PATH):
     print("Downloading DenseNet_model.h5 from Google Drive...")
     url = f"https://drive.google.com/uc?id={DRIVE_FILE_ID}"
     gdown.download(url, MODEL_PATH, quiet=False)
     print("Download completed ✅")
+
 
 # ==========================
 # Load Models
@@ -89,9 +90,29 @@ def research():
     return render_template('research.html')
 
 
-@app.route('/papers<int:year>')
-def papers(year):
-    return render_template(f'papers{year}.html')
+@app.route('/papers19')
+def papers19():
+    return render_template('papers19.html')
+
+@app.route('/papers20')
+def papers20():
+    return render_template('papers20.html')
+
+@app.route('/papers21')
+def papers21():
+    return render_template('papers21.html')
+
+@app.route('/papers22')
+def papers22():
+    return render_template('papers22.html')
+
+@app.route('/papers23')
+def papers23():
+    return render_template('papers23.html')
+
+@app.route('/papers24')
+def papers24():
+    return render_template('papers24.html'))
 
 
 # ==========================
@@ -190,3 +211,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
