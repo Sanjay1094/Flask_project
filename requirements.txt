@@ -6,3 +6,5 @@ opencv-python-headless
 h5py
 gunicorn
 numpy
+gdown
+
