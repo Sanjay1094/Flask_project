@@ -8,6 +8,7 @@ import cv2
 import gdown
 from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.preprocessing.image import load_img, img_to_array, save_img
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 app = Flask(__name__)
 
@@ -225,3 +226,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
