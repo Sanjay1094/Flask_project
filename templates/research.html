@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Papers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styler.css') }}">
+    <script src="https://kit.fontawesome.com/727fe603e3.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <h1>🔬 Research Paper</h1>
+        <p>Innovative Solutions for Early Detection & Treatment</p>
+    </header>
+
+    <!-- Research Areas -->
+    <section class="topics-grid">
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2019</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers19') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2020</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers20') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2021</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers21') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2022</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers22') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2023</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers23') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>2024</h3>
+            </div>
+            <div class="card-back">
+                <a href="{{ url_for('papers24') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

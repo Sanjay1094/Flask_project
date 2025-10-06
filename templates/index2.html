@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancreatic Cancer Detection & Research</title>
+    <link rel="stylesheet" href="static/style2.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Background Animation -->
+    <div class="animated-bg"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">🔬 Pancreatic Research</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+<!--            <li><a href="research.html">Research</a></li>-->
+            <a href="{{ url_for('research') }}">Research</a>
+
+            <li><a href="#detection">Detection</a></li>
+            <li><a href="#prevention">Prevention</a></li>
+            <li><a href="#service">Service</a></li>
+            <li><a href="#mission-section">About</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header Section -->
+    <header>
+        <h1>🔬 Pancreatic Cancer Research</h1>
+        <p>Innovative Solutions for Early Detection & Treatment</p>
+        <!-- <div class="search-box">
+            <input type="text" placeholder="Search for research topics...">
+            <button><i class="fas fa-search"></i></button>
+        </div> -->
+    </header>
+
+    <!-- Research Areas -->
+    <section class="topics-grid">
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>🧬 Genetic Research</h3>
+            </div>
+            <div class="card-back">
+                <p>Exploring genetic mutations linked to pancreatic cancer.</p>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>📡 AI-Based Detection</h3>
+            </div>
+            <div class="card-back">
+                <p>Using AI to analyze CT scans for early diagnosis.</p>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>💊 New Treatments</h3>
+            </div>
+            <div class="card-back">
+                <p>Developing innovative therapies and clinical trials.</p>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="card-front">
+                <h3>🩺 Risk Factors</h3>
+            </div>
+            <div class="card-back">
+                <p>Understanding lifestyle and genetic risk factors.</p>
+            </div>
+        </div>
+    </section>
+<br>
+<br>
+    <!-- Pancreatic Cancer Detection System -->
+    <section id="detection" class="section">
+        <div class="container">
+            <h2 class="section-title">Pancreatic Cancer Detection</h2>
+            <p class="section-subtitle">CT Scan for early and accurate detection.</p>
+
+            <div class="detection-content">
+                <h3>🩺 CT Scan for Pancreatic Cancer Detection</h3>
+                <p>A <strong>Computed Tomography (CT) scan</strong> is one of the most effective imaging techniques for detecting pancreatic cancer. It provides detailed cross-sectional images of the pancreas, helping doctors identify tumors, cysts, or abnormalities.</p>
+
+                <h4>🔬 How It Works?</h4>
+                <ul>
+                    <li>A special <strong>X-ray machine</strong> takes multiple images from different angles.</li>
+                    <li>A computer processes these images to create a <strong>detailed 3D view</strong> of the pancreas.</li>
+                    <li>A <strong>contrast dye</strong> may be injected to highlight tumors or abnormalities.</li>
+                </ul>
+
+                <h4>📌 Why is CT Scan Important?</h4>
+                <ul>
+                    <li>Detects small tumors that may not be visible in regular X-rays.</li>
+                    <li>Helps determine the <strong>size, location, and spread</strong> of cancer.</li>
+                    <li>Assists doctors in planning <strong>biopsies or surgeries</strong>.</li>
+                </ul>
+
+                <h4>📋 Procedure</h4>
+                <ol>
+                    <li>You may need to <strong>fast</strong> for a few hours before the scan.</li>
+                    <li>A <strong>contrast dye</strong> is often given through an IV to enhance visibility.</li>
+                    <li>You lie on a table that moves through the <strong>CT scanner</strong>.</li>
+                    <li>The scanner takes multiple X-ray images, which are combined to create <strong>detailed pancreas images</strong>.</li>
+                </ol>
+
+                <h4>⚠️ Is CT Scan Safe?</h4>
+                <ul>
+                    <li>✔ Generally safe, with minimal radiation exposure.</li>
+                    <li>✔ Contrast dye may cause mild side effects in some individuals.</li>
+                </ul>
+
+                <p class="highlight-text">🔍 <strong>Early detection through a CT scan can significantly improve treatment outcomes!</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cancer Detection System (Image Upload & Processing) -->
+    <section id="image-detection" class="section">
+        <div class="container">
+            <h2 class="section-title">Cancer Detection System</h2>
+            <p class="section-subtitle">Upload a CT scan image to analyze potential cancerous regions.</p>
+
+            <input type="file" id="imageInput" accept="image/*">
+            <br>
+            <button onclick="uploadImage()">Predict</button>
+
+            <div class="image-container">
+                <div>
+                    <h3>Input Image</h3>
+                    <img id="inputImage" style="display:none;">
+                </div>
+                <div>
+                    <h3>Preprocessed Image</h3>
+                    <img id="preprocessedImage" style="display:none;">
+                </div>
+                <div>
+                    <h3>Segmented Cancer Area</h3>
+                    <img id="segmentedImage" style="display:none;">
+                </div>
+            </div>
+
+            <div class="result" id="predictionResult"></div>
+            <div class="accuracy" id="accuracyValue"></div>
+        </div>
+    </section>
+
+<br>
+<br>
+    <section id="prevention">
+        <h2>Pancreatic Cancer Prevention</h2>
+        <p>Pancreatic cancer prevention focuses on lifestyle choices, early screening, and managing risk factors. While no prevention method guarantees complete protection, following these steps can significantly reduce your risk:</p>
+
+        <ul>
+            <li><strong>Maintain a Healthy Diet 🥗</strong><br>
+                Eat a diet rich in fruits, vegetables, and whole grains.<br>
+                Limit processed foods, red meat, and sugary drinks.<br>
+                Include healthy fats like nuts, seeds, and olive oil.</li>
+
+            <li><strong>Stop Smoking 🚭</strong><br>
+                Smoking increases the risk of pancreatic cancer by 2-3 times.<br>
+                Seek support for quitting, such as nicotine replacement therapy and counseling.</li>
+
+            <li><strong>Maintain a Healthy Weight ⚖️</strong><br>
+                Obesity increases cancer risk, so maintain a BMI within the healthy range.<br>
+                Engage in regular physical activity (at least 30 minutes of exercise daily).</li>
+
+            <li><strong>Limit Alcohol Consumption 🍷</strong><br>
+                Heavy alcohol use is linked to pancreatitis, which can increase pancreatic cancer risk.<br>
+                Stick to moderate drinking (e.g., one drink per day for women, two for men).</li>
+
+            <li><strong>Control Diabetes 🩸</strong><br>
+                Uncontrolled Type 2 diabetes is a risk factor.<br>
+                Maintain stable blood sugar levels through diet, exercise, and medication if needed.</li>
+
+            <li><strong>Regular Screening for High-Risk Individuals 🔬</strong><br>
+                Those with a family history of pancreatic cancer should discuss screening options with their doctor.<br>
+                Genetic testing can help identify individuals at higher risk.</li>
+
+            <li><strong>Avoid Exposure to Harmful Chemicals ☢️</strong><br>
+                Reduce exposure to pesticides, industrial chemicals, and pollutants.<br>
+                Follow safety guidelines in workplaces that handle toxic substances.</li>
+
+            <li><strong>Stay Hydrated 💧</strong><br>
+                Drink plenty of water to help detoxify the body and reduce cancer risks.</li>
+        </ul>
+
+        <p><strong>Early Detection Saves Lives! 🔍</strong><br>
+        Regular health checkups and monitoring symptoms like persistent abdominal pain, jaundice, and unexpected weight loss can help in early detection.</p>
+    </section>
+
+<br>
+<!-- Services Section -->
+<section id="service" class="section">
+    <div class="container">
+        <h2 class="section-title">Our Services</h2>
+
+        <div class="service-card">
+            <h3>Welcome to Our Health Consultation Platform</h3>
+            <p>Dedicated to helping individuals with pancreatic cancer. Using advanced deep learning technology, our platform can accurately detect pancreatic cancer through CT scan images. Users can easily upload their scans to receive a quick and reliable diagnosis. Our service connects patients with the most suitable healthcare professionals for timely consultations and early intervention. With user-friendly navigation and state-of-the-art technology, we support patients in managing their health effectively. Trust us to guide you through every step of your journey toward recovery. Join our community and take control of your health today.</p>
+        </div>
+<br>
+        <div class="service-card">
+            <h3>24/7 Health Support ⏰</h3>
+            <p>Our platform is available 24/7 to provide quick and reliable diagnoses using AI-driven deep learning technology. Whether day or night, you can access vital health consultations anytime.</p>
+        </div>
+<br>
+        <div class="service-card">
+            <h3>Medical Counseling 🏥</h3>
+            <p>We provide expert medical counseling to help patients with treatment adherence and improved quality of life. Our approach is based on open communication, shared decision-making, and patient-centered care.</p>
+        </div>
+    </div>
+</section>
+
+
+<section id="mission-section">
+    <div class="mission-text">
+        <h2>Our Mission</h2>
+        <p>
+            Our mission is to empower individuals with pancreatic cancer by providing timely access
+            to specialized medical consultations, ensuring early diagnosis and effective treatment
+            for a healthier future.
+        </p>
+    </div>
+
+    <div class="mission-objectives">
+        <div class="objective">
+            <div class="icon">➤</div>
+            <div class="objective-text">
+                <h3>Objective 1:</h3>
+                <p>Provide Accurate Diagnosis – Utilize advanced deep learning technology to
+                   accurately detect pancreatic cancer from CT scan images, ensuring patients
+                   receive a reliable diagnosis promptly.</p>
+            </div>
+        </div>
+
+        <div class="objective">
+            <div class="icon">➤</div>
+            <div class="objective-text">
+                <h3>Objective 2:</h3>
+                <p>Facilitate Timely Medical Consultation – Offer 24/7 access to connect patients
+                   with the most suitable healthcare professionals, enabling timely consultations
+                   and early intervention for optimal health outcomes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+    <script>
+        function uploadImage() {
+            let fileInput = document.getElementById('imageInput').files[0];
+            if (!fileInput) {
+                alert("Please select an image.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("image", fileInput);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "error") {
+                    alert(data.message);
+                    return;
+                }
+
+                document.getElementById('inputImage').src = "data:image/jpeg;base64," + data.input_image;
+                document.getElementById('inputImage').style.display = "block";
+
+                document.getElementById('preprocessedImage').src = "data:image/jpeg;base64," + data.preprocessed_image;
+                document.getElementById('preprocessedImage').style.display = "block";
+
+                document.getElementById('segmentedImage').src = "data:image/jpeg;base64," + data.segmented_image;
+                document.getElementById('segmentedImage').style.display = "block";
+
+                document.getElementById('predictionResult').innerText = "Prediction: " + data.result;
+                document.getElementById('accuracyValue').innerText = "Model Accuracy: " + data.accuracy + "%";
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+
+</body>
+</html>
