@@ -112,7 +112,7 @@ def papers23():
 
 @app.route('/papers24')
 def papers24():
-    return render_template('papers24.html'))
+    return render_template('papers24.html')
 
 
 # ==========================
@@ -211,4 +211,5 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
