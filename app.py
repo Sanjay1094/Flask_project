@@ -5,70 +5,65 @@ import xgboost as xgb
 import joblib
 import base64
 import cv2
-import gdown
 from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.preprocessing.image import load_img, img_to_array, save_img
+
+# Disable GPU to avoid CUDA errors
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 app = Flask(__name__)
-
-# ==========================
-# Google Drive File Handling
-# ==========================
-DRIVE_FILE_ID = "1k4h7nCN8TniafdXN64YoMO5WFKnix2iZ"  # only the ID
-MODEL_PATH = "DenseNet_model.h5"
-
-# Download model from Drive if not found
-if not os.path.exists(MODEL_PATH):
-    print("Downloading DenseNet_model.h5 from Google Drive...")
-    try:
-        gdown.download(f"https://drive.google.com/uc?id={DRIVE_FILE_ID}", MODEL_PATH, quiet=False)
-        print("✅ Download completed")
-    except Exception as e:
-        print(f"⚠️ Failed to download DenseNet_model.h5: {e}")
-
-# ==========================
-# Lazy Model Loading
-# ==========================
-densenet_model = None
-lstm_model = None
-xgb_model = None
-stacking_model = None
-
-
-def load_models():
-    """Loads models lazily (only when needed)."""
-    global densenet_model, lstm_model, xgb_model, stacking_model
-
-    # Load DenseNet (primary model)
-    if densenet_model is None and os.path.exists(MODEL_PATH):
-        print("Loading DenseNet_model.h5...")
-        densenet_model = tf.keras.models.load_model(MODEL_PATH)
-        print("✅ DenseNet model loaded successfully.")
-
-    # Load optional models if available
-    if lstm_model is None and os.path.exists("LSTM_model.h5"):
-        lstm_model = tf.keras.models.load_model("LSTM_model.h5")
-        print("✅ LSTM model loaded.")
-
-    if xgb_model is None and os.path.exists("xgboost_model.json"):
-        xgb_model = xgb.XGBClassifier()
-        xgb_model.load_model("xgboost_model.json")
-        print("✅ XGBoost model loaded.")
-
-    if stacking_model is None and os.path.exists("stacking_model.joblib"):
-        stacking_model = joblib.load("stacking_model.joblib")
-        print("✅ Stacking model loaded.")
-
 
 # ==========================
 # Image Requirements
 # ==========================
 REQUIRED_SIZE = (512, 512)
 
+# ==========================
+# Lazy-loaded Models
+# ==========================
+densenet_model = None
+lstm_model = None
+stacking_model = None
+xgb_model = None
 
+def get_densenet_model():
+    global densenet_model
+    if densenet_model is None:
+        densenet_model = tf.keras.models.load_model("DenseNet_model.h5")
+    return densenet_model
+
+def get_lstm_model():
+    global lstm_model
+    if lstm_model is None:
+        try:
+            lstm_model = tf.keras.models.load_model("LSTM_model.h5")
+        except:
+            lstm_model = None
+    return lstm_model
+
+def get_stacking_model():
+    global stacking_model
+    if stacking_model is None:
+        try:
+            stacking_model = joblib.load("stacking_model.joblib")
+        except:
+            stacking_model = None
+    return stacking_model
+
+def get_xgb_model():
+    global xgb_model
+    if xgb_model is None:
+        try:
+            xgb_model = xgb.XGBClassifier()
+            xgb_model.load_model("xgboost_model.json")
+        except:
+            xgb_model = None
+    return xgb_model
+
+# ==========================
+# Image preprocessing
+# ==========================
 def preprocess_image(image_path, image_size=(256, 256)):
-    """Preprocesses the image by resizing and normalizing."""
     try:
         img = load_img(image_path, target_size=image_size, color_mode='grayscale')
         img_array = img_to_array(img) / 255.0
@@ -77,9 +72,7 @@ def preprocess_image(image_path, image_size=(256, 256)):
     except Exception as e:
         raise ValueError(f"Error processing image {image_path}: {e}")
 
-
 def validate_ct_scan(image_path):
-    """Validates if the uploaded image meets CT scan requirements."""
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         return False, "Invalid image format"
@@ -87,71 +80,61 @@ def validate_ct_scan(image_path):
         return False, f"Invalid image size. Expected {REQUIRED_SIZE}, but got {img.shape[:2]}"
     return True, "Valid CT scan image"
 
+# ==========================
+# Routes for pages
+# ==========================
+@app.route('/')
+def index():
+    return render_template('index2.html')
 
-# ==========================
-# Routes for Research Papers
-# ==========================
 @app.route('/research')
 def research():
     return render_template('research.html')
 
-
 @app.route('/papers19')
 def papers19():
     return render_template('papers19.html')
-
-
 @app.route('/papers20')
 def papers20():
     return render_template('papers20.html')
-
-
 @app.route('/papers21')
 def papers21():
     return render_template('papers21.html')
-
-
 @app.route('/papers22')
 def papers22():
     return render_template('papers22.html')
-
-
 @app.route('/papers23')
 def papers23():
     return render_template('papers23.html')
-
-
 @app.route('/papers24')
 def papers24():
     return render_template('papers24.html')
 
-
 # ==========================
-# Prediction Logic
+# Prediction logic
 # ==========================
 def predict_cancer(image_path):
-    """Predicts cancer presence using available models."""
-    load_models()  # Lazy load here only when first called
-
     img = preprocess_image(image_path)
-    feature_map = densenet_model.predict(img)
+    densenet = get_densenet_model()
+    feature_map = densenet.predict(img, batch_size=1)
 
-    if lstm_model is not None and stacking_model is not None:
+    lstm = get_lstm_model()
+    stacking = get_stacking_model()
+
+    if lstm and stacking:
         feature_map_reshaped = feature_map.reshape(1, -1, 1)
-        lstm_feature = lstm_model.predict(feature_map_reshaped)
+        lstm_feature = lstm.predict(feature_map_reshaped)
         combined_features = np.hstack((feature_map.reshape(1, -1), lstm_feature))
-        prediction = stacking_model.predict(combined_features)[0]
-        prediction_proba = stacking_model.predict_proba(combined_features)[0][1] * 100
+        prediction = stacking.predict(combined_features)[0]
+        prediction_proba = stacking.predict_proba(combined_features)[0][1] * 100
     else:
-        # fallback if stacking/LSTM not available
+        # fallback if LSTM/stacking not available
         prediction = np.argmax(feature_map)
         prediction_proba = np.max(feature_map) * 100
 
     return ("Cancer detected", prediction_proba) if prediction == 1 else ("No cancer detected", prediction_proba)
 
-
 def highlight_cancer_region(image_path):
-    """Highlights the cancerous region in the image."""
     img = cv2.imread(image_path)
     img = cv2.resize(img, (256, 256))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -163,15 +146,11 @@ def highlight_cancer_region(image_path):
     cv2.imwrite(segmented_path, highlighted_img)
     return segmented_path
 
-
-@app.route('/')
-def index():
-    return render_template('index2.html')
-
-
+# ==========================
+# Flask route for prediction
+# ==========================
 @app.route('/predict', methods=['POST'])
 def predict():
-    """Handles image upload, prediction, and visualization."""
     if 'image' not in request.files:
         return jsonify({'result': 'error', 'message': 'No image uploaded'})
 
@@ -186,16 +165,16 @@ def predict():
 
     try:
         # Encode input image
-        with open(temp_file, "rb") as img_file:
-            input_image = base64.b64encode(img_file.read()).decode('utf-8')
+        with open(temp_file, "rb") as f:
+            input_image = base64.b64encode(f.read()).decode('utf-8')
 
         preprocessed_image = preprocess_image(temp_file)
         preprocessed_path = "preprocessed_image.jpg"
         save_img(preprocessed_path, preprocessed_image[0])
+        with open(preprocessed_path, "rb") as f:
+            preprocessed_image_encoded = base64.b64encode(f.read()).decode('utf-8')
 
-        with open(preprocessed_path, "rb") as img_file:
-            preprocessed_image_encoded = base64.b64encode(img_file.read()).decode('utf-8')
-
+        # Get prediction
         prediction_result, accuracy = predict_cancer(temp_file)
 
         if "Cancer detected" in prediction_result:
@@ -203,14 +182,13 @@ def predict():
         else:
             segmented_path = temp_file
 
-        with open(segmented_path, "rb") as img_file:
-            segmented_image_encoded = base64.b64encode(img_file.read()).decode('utf-8')
+        with open(segmented_path, "rb") as f:
+            segmented_image_encoded = base64.b64encode(f.read()).decode('utf-8')
 
-        # Cleanup temporary files
-        for f in [temp_file, preprocessed_path]:
-            if os.path.exists(f):
-                os.remove(f)
-        if "Cancer detected" in prediction_result and os.path.exists(segmented_path):
+        # Cleanup
+        os.remove(temp_file)
+        os.remove(preprocessed_path)
+        if "Cancer detected" in prediction_result:
             os.remove(segmented_path)
 
         return jsonify({
@@ -223,7 +201,5 @@ def predict():
     except Exception as e:
         return jsonify({'result': 'error', 'message': str(e)})
 
-
 if __name__ == '__main__':
     app.run(debug=True)
-
